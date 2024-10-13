@@ -31,7 +31,20 @@ You will now:
 
 ```python
 # Define the KNN class with two empty methods - fit and predict
+class KNN:
+    def __init__(self, X_train, y_train):
+        # Constructor for initializing any class-specific variables if needed
+        self.X_train = X_train
+        self.y_train = y_train
 
+
+    def fit(self, X_train, y_train):
+        # Method for fitting the model with training data
+        pass
+
+    def predict(self, X_test):
+        # Method for predicting based on the test data
+        pass
 ```
 
 ## Comple the `fit()` method
@@ -49,7 +62,8 @@ In the cell below, complete the `fit` method:
 
 ```python
 def fit():
-    pass
+    self.X_train = X_train
+    self.y_train = y_train
     
 # This line updates the knn.fit method to point to the function you've just written
 KNN.fit = fit
@@ -71,7 +85,13 @@ In the cell below, complete the `_get_distances()` function. This function shoul
 
 ```python
 def _get_distances():
-    pass
+     distances = []
+    for idx, point in enumerate(self.X_train):
+        distance = euclidean(point, x) # calculating the distance
+        distances.append((idx, distance)) # appending the tuple of the distances
+        
+     # return the distances array    
+    return distances
 
 # This line attaches the function you just created as a method to KNN class 
 KNN._get_distances = _get_distances
@@ -90,8 +110,12 @@ Well done! You will now create a `_get_k_nearest()` function to retrieve indices
 
 
 ```python
-def _get_k_nearest():
-    pass
+def _get_k_nearest(self, dists, k):
+    # Sort the dists array by the second element in each tuple
+    sorted_dists = sorted(dists, key=lambda x: x[1])
+    
+    # Return the first k tuples 
+    return sorted_dists[:k]
 
 # This line attaches the function you just created as a method to KNN class 
 KNN._get_k_nearest = _get_k_nearest
@@ -107,8 +131,17 @@ Complete the `_get_label_prediction()` function in the cell below. This function
 
 
 ```python
-def _get_label_prediction():
-    pass
+def _get_label_prediction(self, k_nearest):
+     # Grab the labels from self.y_train using the indices from k_nearest
+    labels = [self.y_train[index] for index, _ in k_nearest]
+
+    # Count the occurrences of each label
+    counts = np.bincount(labels)
+
+    # Get the label with the highest count
+    prediction = np.argmax(counts)
+
+    return prediction
 
 # This line attaches the function you just created as a method to KNN class
 KNN._get_label_prediction = _get_label_prediction
@@ -134,11 +167,29 @@ Follow these instructions to complete the `predict()` method in the cell below:
 
 
 ```python
-def predict():
-    pass
+def predict(self, X_test, k=3):
+    preds = []  # Initialize an empty list to store the predictions
+
+    # Iterate through each point in X_test
+    for x in X_test:
+        # Calculate the distances to all points in X_train
+        dists = self._get_distances(x)
+
+        # Find the k-nearest points in X_train
+        k_nearest = self._get_k_nearest(dists, k)
+
+        # Use the indices from k_nearest to get the labels and predict
+        prediction = self._get_label_prediction(k_nearest)
+
+        # Append the prediction to preds
+        preds.append(prediction)
+        
+    # Return the predicted values after the loop
+    return preds
 
 # This line updates the knn.predict method to point to the function you've just written
 KNN.predict = predict
+
 ```
 
 Great! Now, try out your new KNN classifier on a sample dataset to see how well it works!
@@ -196,7 +247,3 @@ print("Testing Accuracy: {}".format(accuracy_score(None, None)))
 ```
 
 Over 97% accuracy! Not bad for a handwritten machine learning classifier!
-
-## Summary
-
-That was great! Next, you'll dive a little deeper into evaluating performance of a KNN algorithm!
